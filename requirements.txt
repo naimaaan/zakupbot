@@ -3,3 +3,5 @@ requests
 python-dotenv
 openpyxl
 pandas
+nest_asyncio
+playwright

@@ -1,0 +1,16 @@
+services:
+  - type: worker
+    name: zakupbot-monitor
+    env: python
+    plan: free
+    buildCommand: |
+      pip install -r requirements.txt
+      playwright install chromium
+    startCommand: python bot/main.py
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
