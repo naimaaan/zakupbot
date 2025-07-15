@@ -22,13 +22,31 @@ from bot.notifier import (
 from data_sources.test_api_fetch import fetch_procurement_plans
 import os
 import shutil
+import logging
 
 nest_asyncio.apply()
 
+# Настройка логирования
+LOG_FILE = "logs/bot.log"
+logging.basicConfig(
+    level=logging.INFO,  # Уровень логирования (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler(LOG_FILE, encoding="utf-8"),  # Логи сохраняются в файл
+        logging.StreamHandler()  # Логи выводятся в консоль
+    ]
+)
+
+# Пример использования логирования
+logger = logging.getLogger(__name__)
+logger.info("Бот запущен!")
+
+
 async def periodic_check(app):
     while True:
-        await asyncio.sleep(1800)
+        await asyncio.sleep(1800) 
         print("⏰ Автоматическая проверка закупок...")
+        logger.info("⏰ Автоматическая проверка закупок...")
 
         plans = await asyncio.to_thread(fetch_procurement_plans)
         notified_uids = load_notified_uids()
@@ -41,7 +59,8 @@ async def periodic_check(app):
                 continue
 
             print(f"🆕 Проверка UID: {uid}")
-
+            logger.info(f"🆕 Проверка UID: {uid}")
+            
             file_path = await asyncio.to_thread(download_excel_file, uid)
             if not file_path:
                 continue
@@ -67,6 +86,7 @@ async def periodic_check(app):
 
             if not new_rows:
                 print(f"🔁 Нет новых ТРУ строк для БИН {customer_bin}")
+                logger.info(f"🔁 Нет подходящих данных для UID: {uid}")
                 new_uids.add(uid)
                 os.remove(filtered_path)
                 continue
@@ -85,10 +105,10 @@ async def periodic_check(app):
 
             message = (
                 f"🏢  {customer}\n"
-                f"📌  БИН: {customer_bin}\n"
+                f"🆔  БИН: {customer_bin}\n"
                 f"📅  {date_time}\n"
                 f"📋  {duration_type} | {plan_type} | {year}\n"
-                f"🔧  ТРУ: Услуги по обеспечению информационной безопасности.\n"
+                f"🛡️  ТРУ: Услуги по обеспечению информационной безопасности.\n"
                 f"🌐  Источник: zakup.sk.kz\n"
             )
 
@@ -112,6 +132,7 @@ async def periodic_check(app):
                         parse_mode="Markdown"
                     )
                     print(f"✅ Уведомление отправлено пользователю {user_id}")
+                    logger.info(f"✅ Уведомление отправлено пользователю {user_id}")
 
                     email = get_email_for_user(user_id)
                     if email:
@@ -129,13 +150,16 @@ async def periodic_check(app):
                         try:
                             await asyncio.to_thread(send_email_with_attachment, email, new_filepath, message)
                             print(f"📧 Email отправлен на {email}")
+                            logger.info(f"📧 Email отправлен на {email}")
                         except Exception as e:
                             print(f"❌ Ошибка при отправке email {email}: {e}")
+                            logger.error(f"❌ Ошибка при отправке email {email}: {e}")
                         finally:
                             if os.path.exists(new_filepath):
                                 os.remove(new_filepath)
                 except Exception as e:
                     print(f"❌ Ошибка отправки пользователю {user_id}: {e}")
+                    logger.error(f"❌ Ошибка отправки пользователю {user_id}: {e}")
 
             new_uids.add(uid)
             os.remove(filtered_path)
@@ -146,10 +170,12 @@ async def periodic_check(app):
 
 async def run_bot():
     print("✅ Бот запущен.")
+    logger.info("✅ Бот запущен.")
     settings = get_settings()
 
     if not settings.BOT_TOKEN:
         raise ValueError("❌ BOT_TOKEN не задан в .env или окружении.")
+    
 
     app = ApplicationBuilder().token(settings.BOT_TOKEN).build()
     register_handlers(app)
@@ -165,3 +191,4 @@ if __name__ == "__main__":
         loop.run_until_complete(run_bot())
     except KeyboardInterrupt:
         print("⛔ Бот остановлен пользователем.")
+        logger.info("⛔ Бот остановлен пользователем.")
