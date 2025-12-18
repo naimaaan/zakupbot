@@ -1,30 +1,31 @@
-# AI Assistant Telegram Bot
-
-Telegram AI assistant built with **Python** and **aiogram 3**, focused on automation, structured responses, and asynchronous workflows.
+Telegram bot for automated monitoring and notifications, built with **Python**.  
+The project focuses on background processing, filtering logic, and scheduled tasks.
 
 ## Features
-- Telegram Bot API (aiogram 3)
-- Asynchronous handlers (`async` / `await`)
-- Background tasks and scheduler
-- LLM integration (OpenAI-compatible API)
-- Structured and predictable responses
-- User settings and statistics
-- Clean project structure
+- Telegram bot for notifications
+- Subscription-based logic
+- Background jobs and scheduler
+- Data collection from external sources
+- Filtering and matching rules
+- Role-based access
+- Modular architecture
 
 ## Tech Stack
 - Python 3.10+
-- aiogram 3
-- asyncio
-- APScheduler
-- OpenAI API (or compatible LLM provider)
+- Telegram Bot API
+- Async execution model
+- Scheduler (background jobs)
+- External data sources integration
 
 ## Project Structure
 .
-├── bot/ # Telegram bot handlers and routers
-├── services/ # AI client, scheduler, business logic
-├── middlewares/ # Bot middlewares
-├── keyboards/ # Inline / reply keyboards
-├── config/ # App configuration
+├── handlers/ # Telegram handlers
+├── services/ # Business logic
+├── scheduler/ # Background jobs
+├── data_sources/ # External data collectors
+├── filter_engine/ # Filtering logic
+├── notifier/ # Notifications
+├── config/ # Configuration
 ├── main.py # Entry point
 
 bash
@@ -32,8 +33,8 @@ bash
 
 ## Setup & Run
 ```bash
-git clone https://github.com/naimaaan/ai-assistant-bot.git
-cd ai-assistant-bot
+git clone https://github.com/naimaaan/zakupbot.git
+cd zakupbot
 
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
@@ -42,6 +43,6 @@ pip install -r requirements.txt
 cp .env.example .env
 python main.py
 Notes
-.env contains secrets and is not committed
+Project was developed as a real automation bot
 
-This project demonstrates Telegram automation and AI workflows
+Focus on stability and extensibility
